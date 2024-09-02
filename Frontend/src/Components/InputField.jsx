@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 
 const InputField = ({
-  type = "text",
+  type = "",
   placeholder = "",
   value = "",
   onChange,
@@ -22,7 +22,8 @@ const InputField = ({
       placeholder={placeholder}
       value={value}
       onChange={onChange}
-      className={`border border-gray-300 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${className}`}
+      className={`border border-gray-300 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:border-blur 
+      hover:border-gray-500 hover:shadow-md ${className}`}
       disabled={disabled}
       readOnly={readOnly}
       id={id}
