@@ -1,7 +1,10 @@
+import InputField from "./Components/inputField";
 function App() {
   return (
     <>
-      <div className="text-blue-500">form</div>
+      <div>
+        <InputField />
+      </div>
     </>
   );
 }
