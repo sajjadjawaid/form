@@ -15,16 +15,15 @@ const CandidateDetailsSection = () => {
   const dateExitedRef = useRef(null);
 
   const validateDate = (date) => {
-    const regex = /^\d{2}-\d{2}-\d{4}$/;
+    const regex = /^\d{2}-\d{2}-\d{4}$/; // Regex to match MM-DD-YYYY format
     if (!regex.test(date)) {
-      return false;
+      console.log(`Invalid format: ${date}`); // Debug statement
+      return false; // Date does not match the format
     }
 
-    const [month, day, year] = date.split("-").map(Number);
-    if (year < 1000 || year > 9999) {
-      return false;
-    }
+    const [month, day, year] = date.split("-").map(Number); // Split using MM-DD-YYYY order
 
+    // Handle month length based on month and leap years
     const daysInMonth = [
       31,
       28 + (year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0) ? 1 : 0),
@@ -40,36 +39,47 @@ const CandidateDetailsSection = () => {
       31,
     ];
 
+    // Check if the month and day are valid
     if (month < 1 || month > 12 || day < 1 || day > daysInMonth[month - 1]) {
-      return false;
+      console.log(`Invalid date: ${date}`); // Debug statement
+      return false; // Invalid month or day
     }
 
-    const inputDate = new Date(year, month - 1, day);
-    const currentDate = new Date();
-    currentDate.setHours(0, 0, 0, 0);
+    const inputDate = new Date(year, month - 1, day); // Create a Date object with the input date
+    const currentDate = new Date(); // Current date
+    currentDate.setHours(0, 0, 0, 0); // Set current time to midnight for accurate comparison
 
-    if (inputDate < currentDate) {
-      return false;
+    // Log the dates for comparison
+    console.log(`Input date: ${inputDate.toDateString()}`);
+    console.log(`Current date: ${currentDate.toDateString()}`);
+
+    // Check if the date is in the past
+    if (inputDate.getTime() < currentDate.getTime()) {
+      console.log(`Date is in the past: ${date}`); // Debug statement
+      return false; // Invalid if the date is in the past
     }
 
+    // Check if the year is within 10 years from the current year
     const currentYear = currentDate.getFullYear();
     if (year < currentYear || year > currentYear + 10) {
-      return false;
+      console.log(`Year out of range: ${date}`); // Debug statement
+      return false; // Invalid if the year is outside the range
     }
 
-    return true;
+    return true; // Date is valid if all checks pass
   };
 
   const handleDateChange = (setter, setValid, value, compareDate = null) => {
-    setter(value);
-    const isValid = validateDate(value);
+    setter(value); // Set the input value
+    const isValid = validateDate(value); // Validate the date format and range
 
     if (compareDate) {
       if (!validateDate(compareDate)) {
-        setValid(false);
+        setValid(false); // Invalid if the compare date is not valid
         return;
       }
 
+      // If a compare date is provided, ensure the current date is after it
       const [inputMonth, inputDay, inputYear] = value.split("-").map(Number);
       const [compareMonth, compareDay, compareYear] = compareDate
         .split("-")
@@ -79,14 +89,13 @@ const CandidateDetailsSection = () => {
       const compareToDate = new Date(compareYear, compareMonth - 1, compareDay);
 
       if (inputDate < compareToDate) {
-        setValid(false);
+        setValid(false); // Invalid if the input date is before the comparison date
         return;
       }
     }
 
-    setValid(isValid);
+    setValid(isValid); // Set the validity based on the date format and range
   };
-
   return (
     <div className="p-6 max-w-2xl mx-auto">
       <h2 className="text-xl font-bold mb-6">Candidate Details</h2>
@@ -166,7 +175,7 @@ const CandidateDetailsSection = () => {
                 setDateStarted,
                 setIsDateStartedValid,
                 e.target.value,
-                true
+                false
               )
             }
             className={`w-full p-2 border rounded-lg focus:outline-none focus:ring-2 uppercase text-blue-500 focus:ring-blue-500 placeholder-blue-500 ${
@@ -212,7 +221,7 @@ const CandidateDetailsSection = () => {
                 dateStarted
               )
             }
-            className={`w-full p-2 border rounded-lg focus:outline-none focus:ring-2 uppercase text-blue-500 focus:ring-blue-500 ${
+            className={`w-full p-2 border rounded-lg focus:outline-none focus:ring-2 uppercase placeholder-blue-500 text-blue-500 focus:ring-blue-500 ${
               !isDateExitedValid ? "border-red-500" : ""
             }`}
             ref={dateExitedRef}
