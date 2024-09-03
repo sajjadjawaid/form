@@ -1,5 +1,7 @@
 import { useState, useRef } from "react";
-import { AiOutlineWarning, AiOutlineCalendar } from "react-icons/ai"; // Import warning and calendar icons
+import { AiOutlineWarning } from "react-icons/ai"; // Import warning and calendar icons
+import { TbCalendarCheck } from "react-icons/tb";
+
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
@@ -138,22 +140,24 @@ const CandidateDetailsSection = () => {
             Date Started
           </label>
           <div className="relative">
-            <DatePicker
-              selected={dateStarted ? new Date(dateStarted) : null}
-              onChange={(date) =>
-                handleDateChange(setDateStarted, setIsDateStartedValid, date)
-              }
-              dateFormat="MM-dd-yyyy"
-              placeholderText="MM-DD-YYYY"
-              className={`w-full p-2 pl-8 border rounded-lg focus:outline-none focus:ring-2 uppercase text-blue-500 focus:ring-blue-500 placeholder-blue-500 ${
-                !isDateStartedValid ? "border-red-500" : ""
-              }`}
-              ref={dateStartedRef} // Attach ref to the DatePicker
-            />
-            <AiOutlineCalendar
-              className="absolute top-1/2 right-2 transform -translate-y-1/2 text-gray-500 cursor-pointer"
-              onClick={() => dateStartedRef.current.setFocus()} // Focus the DatePicker input when icon is clicked
-            />
+            <div className="relative">
+              <DatePicker
+                selected={dateStarted ? new Date(dateStarted) : null}
+                onChange={(date) =>
+                  handleDateChange(setDateStarted, setIsDateStartedValid, date)
+                }
+                dateFormat="MM-dd-yyyy"
+                placeholderText="MM-DD-YYYY"
+                className={`w-full p-2 pr-10 border rounded-lg focus:outline-none focus:ring-2 uppercase text-blue-500 focus:ring-blue-500 placeholder-blue-500 ${
+                  !isDateStartedValid ? "border-red-500" : ""
+                }`}
+                ref={dateStartedRef} // Attach ref to the DatePicker
+              />
+              <TbCalendarCheck
+                className="absolute top-1/2 right-2 transform -translate-y-1/2 text-gray-500 cursor-pointer"
+                onClick={() => dateStartedRef.current.setFocus()} // Focus the DatePicker input when icon is clicked
+              />
+            </div>
           </div>
           <div className="mt-1">
             <small className="text-gray-600">Date</small>
@@ -181,28 +185,30 @@ const CandidateDetailsSection = () => {
             Date of Exiting
           </label>
           <div className="relative">
-            <DatePicker
-              selected={dateExited ? new Date(dateExited) : null}
-              onChange={(date) =>
-                handleDateChange(
-                  setDateExited,
-                  setIsDateExitedValid,
-                  date,
-                  dateStarted ? new Date(dateStarted) : null
-                )
-              }
-              dateFormat="MM-dd-yyyy"
-              placeholderText="MM-DD-YYYY"
-              className={`w-full p-2 pl-8 border rounded-lg focus:outline-none focus:ring-2 uppercase placeholder-blue-500 text-blue-500 focus:ring-blue-500 ${
-                !isDateExitedValid ? "border-red-500" : ""
-              }`}
-              disabled={!isDateStartedValid || !dateStarted}
-              ref={dateExitedRef} // Attach ref to the DatePicker
-            />
-            <AiOutlineCalendar
-              className="absolute top-1/2 right-2 transform -translate-y-1/2 text-gray-500 cursor-pointer"
-              onClick={() => dateExitedRef.current.setFocus()} // Focus the DatePicker input when icon is clicked
-            />
+            <div className="relative">
+              <DatePicker
+                selected={dateExited ? new Date(dateExited) : null}
+                onChange={(date) =>
+                  handleDateChange(
+                    setDateExited,
+                    setIsDateExitedValid,
+                    date,
+                    dateStarted ? new Date(dateStarted) : null
+                  )
+                }
+                dateFormat="MM-dd-yyyy"
+                placeholderText="MM-DD-YYYY"
+                className={`w-full p-2 pr-10 border rounded-lg focus:outline-none focus:ring-2 uppercase placeholder-blue-500 text-blue-500 focus:ring-blue-500 ${
+                  !isDateExitedValid ? "border-red-500" : ""
+                }`}
+                disabled={!isDateStartedValid || !dateStarted}
+                ref={dateExitedRef} // Attach ref to the DatePicker
+              />
+              <TbCalendarCheck
+                className="absolute top-1/2 right-2 transform -translate-y-1/2 text-gray-500 cursor-pointer"
+                onClick={() => dateExitedRef.current.setFocus()} // Focus the DatePicker input when icon is clicked
+              />
+            </div>
           </div>
           <div className="mt-1">
             <small className="text-gray-600">Date</small>
