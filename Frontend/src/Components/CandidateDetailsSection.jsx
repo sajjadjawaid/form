@@ -1,10 +1,8 @@
 import { useState, useRef } from "react";
 import InputField from "./InputField";
-// import { TbCalendarCheck } from "react-icons/tb";
 import { AiOutlineWarning } from "react-icons/ai"; // Import warning icon
 
 const CandidateDetailsSection = () => {
-  // State to manage form input values
   const [candidateName, setCandidateName] = useState("");
   const [department, setDepartment] = useState("");
   const [designation, setDesignation] = useState("");
@@ -13,20 +11,20 @@ const CandidateDetailsSection = () => {
   const [isDateStartedValid, setIsDateStartedValid] = useState(true);
   const [isDateExitedValid, setIsDateExitedValid] = useState(true);
 
-  // Refs for input fields to control focus
   const dateStartedRef = useRef(null);
   const dateExitedRef = useRef(null);
 
-  // Function to validate date in YYYY-MM-DD format
   const validateDate = (date) => {
-    const regex = /^\d{4}-\d{2}-\d{2}$/;
+    const regex = /^\d{2}-\d{2}-\d{4}$/;
     if (!regex.test(date)) {
       return false;
     }
 
-    const [year, month, day] = date.split("-").map(Number);
+    const [month, day, year] = date.split("-").map(Number);
+    if (year < 1000 || year > 9999) {
+      return false;
+    }
 
-    // Handle month length based on month and leap years
     const daysInMonth = [
       31,
       28 + (year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0) ? 1 : 0),
@@ -42,22 +40,58 @@ const CandidateDetailsSection = () => {
       31,
     ];
 
-    return day > 0 && day <= daysInMonth[month - 1];
+    if (month < 1 || month > 12 || day < 1 || day > daysInMonth[month - 1]) {
+      return false;
+    }
+
+    const inputDate = new Date(year, month - 1, day);
+    const currentDate = new Date();
+    currentDate.setHours(0, 0, 0, 0);
+
+    if (inputDate < currentDate) {
+      return false;
+    }
+
+    const currentYear = currentDate.getFullYear();
+    if (year < currentYear || year > currentYear + 10) {
+      return false;
+    }
+
+    return true;
   };
 
-  // Handle date input change with validation
-  const handleDateChange = (setter, setValid, value) => {
+  const handleDateChange = (setter, setValid, value, compareDate = null) => {
     setter(value);
-    setValid(validateDate(value));
+    const isValid = validateDate(value);
+
+    if (compareDate) {
+      if (!validateDate(compareDate)) {
+        setValid(false);
+        return;
+      }
+
+      const [inputMonth, inputDay, inputYear] = value.split("-").map(Number);
+      const [compareMonth, compareDay, compareYear] = compareDate
+        .split("-")
+        .map(Number);
+
+      const inputDate = new Date(inputYear, inputMonth - 1, inputDay);
+      const compareToDate = new Date(compareYear, compareMonth - 1, compareDay);
+
+      if (inputDate < compareToDate) {
+        setValid(false);
+        return;
+      }
+    }
+
+    setValid(isValid);
   };
 
   return (
     <div className="p-6 max-w-2xl mx-auto">
       <h2 className="text-xl font-bold mb-6">Candidate Details</h2>
 
-      {/* Row for Name of the Candidate and Department */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-        {/* Name of the Candidate */}
         <div>
           <label
             className="block text-sm font-medium text-black mb-1"
@@ -75,7 +109,6 @@ const CandidateDetailsSection = () => {
           />
         </div>
 
-        {/* Department */}
         <div>
           <label
             className="block text-sm font-medium text-black mb-1"
@@ -94,7 +127,6 @@ const CandidateDetailsSection = () => {
         </div>
       </div>
 
-      {/* Row for Designation */}
       <div className="mb-4">
         <label
           className="block text-sm font-medium text-black mb-1"
@@ -112,9 +144,7 @@ const CandidateDetailsSection = () => {
         />
       </div>
 
-      {/* Row for Date Started and Date of Exiting */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-        {/* Date Started */}
         <div
           className={`relative ${
             !isDateStartedValid ? "bg-red-100 p-2 rounded" : ""
@@ -127,36 +157,37 @@ const CandidateDetailsSection = () => {
             Date Started
           </label>
           <InputField
-            type="date"
+            type="text"
             id="dateStarted"
             value={dateStarted}
+            placeholder="MM-DD-YYYY"
             onChange={(e) =>
               handleDateChange(
                 setDateStarted,
                 setIsDateStartedValid,
-                e.target.value
+                e.target.value,
+                true
               )
             }
-            className={`w-full p-2 border rounded-lg focus:outline-none focus:ring-2 uppercase text-blue-500 focus:ring-blue-500 ${
+            className={`w-full p-2 border rounded-lg focus:outline-none focus:ring-2 uppercase text-blue-500 focus:ring-blue-500 placeholder-blue-500 ${
               !isDateStartedValid ? "border-red-500" : ""
             }`}
             ref={dateStartedRef}
           />
-
           <div className="mt-1">
             <small className="text-gray-600">Date</small>
             {!isDateStartedValid && (
               <div className="flex items-center mt-1 text-white bg-red-500 p-2 rounded">
                 <AiOutlineWarning className="mr-2" />
                 <small>
-                  This date is not valid. The date format is YYYY-MM-DD.
+                  This date is not valid. Ensure the year is four digits, the
+                  date format is MM-DD-YYYY, and the date is not in the past.
                 </small>
               </div>
             )}
           </div>
         </div>
 
-        {/* Date of Exiting */}
         <div
           className={`relative ${
             !isDateExitedValid ? "bg-red-100 p-2 rounded" : ""
@@ -169,29 +200,32 @@ const CandidateDetailsSection = () => {
             Date of Exiting
           </label>
           <InputField
-            type="date"
+            type="text"
             id="dateExited"
             value={dateExited}
+            placeholder="MM-DD-YYYY"
             onChange={(e) =>
               handleDateChange(
                 setDateExited,
                 setIsDateExitedValid,
-                e.target.value
+                e.target.value,
+                dateStarted
               )
             }
             className={`w-full p-2 border rounded-lg focus:outline-none focus:ring-2 uppercase text-blue-500 focus:ring-blue-500 ${
               !isDateExitedValid ? "border-red-500" : ""
             }`}
             ref={dateExitedRef}
+            disabled={!isDateStartedValid || !dateStarted}
           />
-
           <div className="mt-1">
             <small className="text-gray-600">Date</small>
             {!isDateExitedValid && (
               <div className="flex items-center mt-1 text-white bg-red-500 p-2 rounded">
                 <AiOutlineWarning className="mr-2" />
                 <small>
-                  This date is not valid. The date format is YYYY-MM-DD.
+                  This date is not valid. The date format is MM-DD-YYYY, and it
+                  must be after the &quot;Date Started.&quot;
                 </small>
               </div>
             )}
