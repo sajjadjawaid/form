@@ -1,29 +1,52 @@
 import { useState, useRef } from "react";
 import InputField from "./InputField";
 import { AiOutlineWarning } from "react-icons/ai"; // Import warning icon
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 const CandidateDetailsSection = () => {
   const [candidateName, setCandidateName] = useState("");
   const [department, setDepartment] = useState("");
   const [designation, setDesignation] = useState("");
-  const [dateStarted, setDateStarted] = useState("");
-  const [dateExited, setDateExited] = useState("");
+  const [dateStarted, setDateStarted] = useState(null);
+  const [dateExited, setDateExited] = useState(null);
   const [isDateStartedValid, setIsDateStartedValid] = useState(true);
   const [isDateExitedValid, setIsDateExitedValid] = useState(true);
 
-  const dateStartedRef = useRef(null);
-  const dateExitedRef = useRef(null);
+  const handleDateChange = (setter, setValid, date, compareDate = null) => {
+    const formattedDate = date ? date.toLocaleDateString("en-US") : "";
+    setter(formattedDate);
+    const dateString = date ? date.toISOString().split("T")[0] : "";
 
-  const validateDate = (date) => {
-    const regex = /^\d{2}-\d{2}-\d{4}$/; // Regex to match MM-DD-YYYY format
-    if (!regex.test(date)) {
-      console.log(`Invalid format: ${date}`); // Debug statement
-      return false; // Date does not match the format
+    const isValid = validateDate(dateString);
+
+    if (compareDate) {
+      const compareDateString = compareDate
+        ? compareDate.toISOString().split("T")[0]
+        : "";
+      if (!validateDate(compareDateString)) {
+        setValid(false);
+        return;
+      }
+
+      if (date < compareDate) {
+        setValid(false);
+        return;
+      }
     }
 
-    const [month, day, year] = date.split("-").map(Number); // Split using MM-DD-YYYY order
+    setValid(isValid);
+  };
 
-    // Handle month length based on month and leap years
+  const validateDate = (date) => {
+    const regex = /^\d{4}-\d{2}-\d{2}$/; // Regex to match YYYY-MM-DD format
+    if (!regex.test(date)) {
+      console.log(`Invalid format: ${date}`);
+      return false;
+    }
+
+    const [year, month, day] = date.split("-").map(Number);
+
     const daysInMonth = [
       31,
       28 + (year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0) ? 1 : 0),
@@ -39,63 +62,29 @@ const CandidateDetailsSection = () => {
       31,
     ];
 
-    // Check if the month and day are valid
     if (month < 1 || month > 12 || day < 1 || day > daysInMonth[month - 1]) {
-      console.log(`Invalid date: ${date}`); // Debug statement
-      return false; // Invalid month or day
+      console.log(`Invalid date: ${date}`);
+      return false;
     }
 
-    const inputDate = new Date(year, month - 1, day); // Create a Date object with the input date
-    const currentDate = new Date(); // Current date
-    currentDate.setHours(0, 0, 0, 0); // Set current time to midnight for accurate comparison
+    const inputDate = new Date(year, month - 1, day);
+    const currentDate = new Date();
+    currentDate.setHours(0, 0, 0, 0);
 
-    // Log the dates for comparison
-    console.log(`Input date: ${inputDate.toDateString()}`);
-    console.log(`Current date: ${currentDate.toDateString()}`);
-
-    // Check if the date is in the past
     if (inputDate.getTime() < currentDate.getTime()) {
-      console.log(`Date is in the past: ${date}`); // Debug statement
-      return false; // Invalid if the date is in the past
+      console.log(`Date is in the past: ${date}`);
+      return false;
     }
 
-    // Check if the year is within 10 years from the current year
     const currentYear = currentDate.getFullYear();
     if (year < currentYear || year > currentYear + 10) {
-      console.log(`Year out of range: ${date}`); // Debug statement
-      return false; // Invalid if the year is outside the range
+      console.log(`Year out of range: ${date}`);
+      return false;
     }
 
-    return true; // Date is valid if all checks pass
+    return true;
   };
 
-  const handleDateChange = (setter, setValid, value, compareDate = null) => {
-    setter(value); // Set the input value
-    const isValid = validateDate(value); // Validate the date format and range
-
-    if (compareDate) {
-      if (!validateDate(compareDate)) {
-        setValid(false); // Invalid if the compare date is not valid
-        return;
-      }
-
-      // If a compare date is provided, ensure the current date is after it
-      const [inputMonth, inputDay, inputYear] = value.split("-").map(Number);
-      const [compareMonth, compareDay, compareYear] = compareDate
-        .split("-")
-        .map(Number);
-
-      const inputDate = new Date(inputYear, inputMonth - 1, inputDay);
-      const compareToDate = new Date(compareYear, compareMonth - 1, compareDay);
-
-      if (inputDate < compareToDate) {
-        setValid(false); // Invalid if the input date is before the comparison date
-        return;
-      }
-    }
-
-    setValid(isValid); // Set the validity based on the date format and range
-  };
   return (
     <div className="p-6 max-w-2xl mx-auto">
       <h2 className="text-xl font-bold mb-6">Candidate Details</h2>
@@ -165,23 +154,16 @@ const CandidateDetailsSection = () => {
           >
             Date Started
           </label>
-          <InputField
-            type="text"
-            id="dateStarted"
-            value={dateStarted}
-            placeholder="MM-DD-YYYY"
-            onChange={(e) =>
-              handleDateChange(
-                setDateStarted,
-                setIsDateStartedValid,
-                e.target.value,
-                false
-              )
+          <DatePicker
+            selected={dateStarted ? new Date(dateStarted) : null}
+            onChange={(date) =>
+              handleDateChange(setDateStarted, setIsDateStartedValid, date)
             }
+            dateFormat="MM-dd-yyyy"
+            placeholderText="MM-DD-YYYY"
             className={`w-full p-2 border rounded-lg focus:outline-none focus:ring-2 uppercase text-blue-500 focus:ring-blue-500 placeholder-blue-500 ${
               !isDateStartedValid ? "border-red-500" : ""
             }`}
-            ref={dateStartedRef}
           />
           <div className="mt-1">
             <small className="text-gray-600">Date</small>
@@ -208,23 +190,21 @@ const CandidateDetailsSection = () => {
           >
             Date of Exiting
           </label>
-          <InputField
-            type="text"
-            id="dateExited"
-            value={dateExited}
-            placeholder="MM-DD-YYYY"
-            onChange={(e) =>
+          <DatePicker
+            selected={dateExited ? new Date(dateExited) : null}
+            onChange={(date) =>
               handleDateChange(
                 setDateExited,
                 setIsDateExitedValid,
-                e.target.value,
-                dateStarted
+                date,
+                dateStarted ? new Date(dateStarted) : null
               )
             }
+            dateFormat="MM-dd-yyyy"
+            placeholderText="MM-DD-YYYY"
             className={`w-full p-2 border rounded-lg focus:outline-none focus:ring-2 uppercase placeholder-blue-500 text-blue-500 focus:ring-blue-500 ${
               !isDateExitedValid ? "border-red-500" : ""
             }`}
-            ref={dateExitedRef}
             disabled={!isDateStartedValid || !dateStarted}
           />
           <div className="mt-1">
