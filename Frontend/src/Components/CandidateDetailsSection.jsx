@@ -148,13 +148,13 @@ const CandidateDetailsSection = () => {
                 }
                 dateFormat="MM-dd-yyyy"
                 placeholderText="MM-DD-YYYY"
-                className={`w-full p-2 relative pr-10 border rounded-lg focus:outline-none focus:ring-2 uppercase text-blue-500 focus:ring-blue-500 placeholder-blue-500 ${
+                className={`w-72 p-2 relative pr-10 border rounded-lg focus:outline-none focus:ring-2 uppercase text-blue-500 focus:ring-blue-500 placeholder-blue-500 ${
                   !isDateStartedValid ? "border-red-500" : ""
                 }`}
                 ref={dateStartedRef} // Attach ref to the DatePicker
               />
               <TbCalendarCheck
-                className="absolute top-1/2 right-20 transform -translate-y-1/2 text-gray-500 cursor-pointer"
+                className="absolute top-1/2 right-12 transform -translate-y-1/2 text-gray-500 cursor-pointer"
                 onClick={() => dateStartedRef.current.setFocus()} // Focus the DatePicker input when icon is clicked
               />
             </div>
@@ -198,14 +198,14 @@ const CandidateDetailsSection = () => {
                 }
                 dateFormat="MM-dd-yyyy"
                 placeholderText="MM-DD-YYYY"
-                className={`w-full p-2 pr-10 border rounded-lg focus:outline-none focus:ring-2 uppercase placeholder-blue-500 text-blue-500 focus:ring-blue-500 ${
+                className={`w-72 p-2 pr-10 border rounded-lg focus:outline-none focus:ring-2 uppercase placeholder-blue-500 text-blue-500 focus:ring-blue-500 ${
                   !isDateExitedValid ? "border-red-500" : ""
                 }`}
                 disabled={!isDateStartedValid || !dateStarted}
                 ref={dateExitedRef} // Attach ref to the DatePicker
               />
               <TbCalendarCheck
-                className="absolute top-1/2 right-20 transform -translate-y-1/2 text-gray-500 cursor-pointer"
+                className="absolute top-1/2 right-12 transform -translate-y-1/2 text-gray-500 cursor-pointer"
                 onClick={() => dateExitedRef.current.setFocus()} // Focus the DatePicker input when icon is clicked
               />
             </div>
